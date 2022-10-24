@@ -12,7 +12,6 @@ void Try(int i){
         if(used[j] == 0){
             used[j] = 1;
             x[i] = j;
-            int tmp;
         }
         else continue;
         if(i == n) Output();
