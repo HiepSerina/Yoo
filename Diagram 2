@@ -1,0 +1,14 @@
+title Game Loop Sequence Diagram
+
+Game->Game: run()
+Game->Game: update()
+Game->Player: move()
+Player->Player: canAttack()
+Player-->Player: return bool
+Player->Bullet: create Bullet()
+Bullet->Bullet: update()
+Bullet->Enemy: getBounds()
+Enemy->Enemy: collision
+Enemy->Enemy: if collision: damageEnemy()
+Game->Game: updateGUI()
+Game->RenderWindow: render()
