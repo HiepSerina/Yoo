@@ -72,3 +72,109 @@ Game->Game: renderGUI()
 alt If player is dead
     Game->Game: show Game Over screen
 end
+
+
+// Bản 2
+
+Actor (User) -> Game: run()
+activate Game
+
+Game -> Game: initWindow()
+Game -> Game: initWelcome()
+Game -> Game: initTextures()
+Game -> Game: initGUI()
+Game -> Game: initWorld()
+Game -> Game: initSystems()
+Game -> Game: initPlayer()
+Game -> Game: initEnemies()
+
+loop Welcome Screen
+    Game -> Game: renderWelcome()
+    Game --> Actor: Display welcome screen
+end
+
+loop Game Loop
+    Game -> Game: updatePollEvents()
+    
+    alt Player is alive
+        Game -> Game: updateInput()
+        alt Key A pressed
+            Game -> Player: move(-1.f, 0.f)
+        else Key D pressed
+            Game -> Player: move(1.f, 0.f)
+        else Key W pressed
+            Game -> Player: move(0.f, -1.f)
+        else Key S pressed
+            Game -> Player: move(0.f, 1.f)
+        end
+        
+        alt Left mouse button pressed && Player can attack
+            Game -> Player: canAttack()
+            Game -> Bullet: new Bullet()
+            Game -> Game: bullets.push_back()
+        end
+        
+        Game -> Player: update()
+        Game -> Game: updateCollision()
+        Game -> Game: updateBullets()
+        loop for each Bullet
+            Game -> Bullet: update()
+            alt Bullet out of screen
+                Game -> Game: delete Bullet
+            end
+        end
+        
+        Game -> Game: updateEnemies()
+        alt Spawn timer reached
+            Game -> Enemy: new Enemy()
+            Game -> Game: enemies.push_back()
+        end
+        loop for each Enemy
+            Game -> Enemy: update()
+            alt Enemy out of screen
+                Game -> Game: delete Enemy
+            else Enemy collides with Player
+                Game -> Player: loseHp()
+                Game -> Game: delete Enemy
+            end
+        end
+        
+        Game -> Game: updateCombat()
+        loop for each Enemy
+            loop for each Bullet
+                alt Enemy collides with Bullet
+                    Game -> Game: delete Enemy
+                    Game -> Game: delete Bullet
+                    Game -> Game: update points
+                end
+            end
+        end
+        
+        Game -> Game: updateGUI()
+        Game -> Game: updateWorld()
+        
+        Game -> Game: render()
+        Game -> Game: renderWorld()
+        Game -> Player: render()
+        loop for each Bullet
+            Game -> Bullet: render()
+        end
+        loop for each Enemy
+            Game -> Enemy: render()
+        end
+        Game -> Game: renderGUI()
+        
+        alt Player HP <= 0
+            Game -> Game: draw gameOverText
+            alt Left mouse button pressed
+                Game -> Game: initPlayer()
+                Game -> Game: initEnemies()
+                Game -> Game: initSystems()
+            end
+        end
+        
+        Game --> Actor: Display updated game state
+    end
+end
+
+deactivate Game
