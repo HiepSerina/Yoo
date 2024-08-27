@@ -1,0 +1,74 @@
+title Tank Game
+
+
+Game->Game: run()
+Game->Game: renderWelcome()
+loop Until player presses 'P'
+    Game->Game: renderWelcome()
+end
+
+loop While window is open
+    Game->Game: updatePollEvents()
+    alt If player is alive
+        Game->Game: update()
+    end
+    Game->Game: render()
+end
+
+Game->Game: update()
+Game->Game: updateInput()
+alt If attack is possible
+    Game->Player: canAttack()
+    Player-->Game: return bool
+    alt If true
+        Game->Bullet: create Bullet()
+        Bullet->Bullet: update()
+    end
+end
+
+Player->Player: update()
+
+Game->Game: updateCollision()
+alt If player collides with boundaries
+    Game->Player: setPosition()
+end
+
+Game->Game: updateBullets()
+loop For each bullet
+    Bullet->Bullet: update()
+    alt If bullet goes out of bounds
+        Game->Bullet: delete bullet
+    end
+end
+
+Game->Game: updateEnemies()
+Game->Enemy: update()
+alt If enemy collides with player
+    Enemy->Player: loseHp()
+    Game->Enemy: delete enemy
+end
+loop For each bullet
+    alt If enemy collides with bullet
+        Enemy->Player: loseHp()
+        Game->Enemy: delete enemy
+        Game->Bullet: delete bullet
+    end
+end
+
+Game->Game: updateCombat()
+Game->Game: updateGUI()
+Game->Game: updateWorld()
+
+Game->Game: render()
+Game->Game: renderWorld()
+Player->Player: render()
+loop For each bullet
+    Bullet->Bullet: render()
+end
+loop For each enemy
+    Enemy->Enemy: render()
+end
+Game->Game: renderGUI()
+alt If player is dead
+    Game->Game: show Game Over screen
+end
